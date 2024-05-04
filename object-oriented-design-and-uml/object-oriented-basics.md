@@ -12,49 +12,74 @@ If you have never used an object-oriented programming language before, you will 
 
 **Class Code Snippet:**
 
-```python
-class ShoppingCart(object):
+```Java 
+import java.util.HashMap;
+import java.util.Map;
 
-    def __init__(self):
-      self.total = 0
-      self.items = {}
+public class ShoppingCart {
+    private double total;
+    private Map<String, Integer> items;
 
-    def add_item(self, item_name, quantity, price):
-        self.total += (quantity * price)
-        self.items.update({item_name : quantity})
+    public ShoppingCart() {
+        this.total = 0;
+        this.items = new HashMap<>();
+    }
 
+    public void addItem(String itemName, int quantity, double price) {
+        this.total += (quantity * price);
+        this.items.put(itemName, this.items.getOrDefault(itemName, 0) + quantity);
+    }
 
-    def remove_item(self, item_name, quantity, price):
-        self.total -= (quantity * price)
-        if quantity > self.items[item_name]:
-          del self.items[item_name]
-        self.items[item_name] -= quantity
+    public void removeItem(String itemName, int quantity, double price) {
+        if (this.items.containsKey(itemName)) {
+            int currentQuantity = this.items.get(itemName);
+            if (quantity >= currentQuantity) {
+                this.items.remove(itemName);
+                this.total -= (currentQuantity * price);
+            } else {
+                this.items.put(itemName, currentQuantity - quantity);
+                this.total -= (quantity * price);
+            }
+        }
+    }
 
+    public String checkout(double cashPaid) {
+        if (cashPaid < this.total) {
+            return """
+                   You paid %f but cart amount is %f
+                   """.formatted(cashPaid, this.total);
+        }
+        double balance = cashPaid - this.total;
+        return """
+               Exchange amount: %f
+               """.formatted(balance);
+    }
+}
 
-    def checkout(self, cash_paid):
-        balance = 0
-        if cash_paid < self.total:
-          return "You paid {} but cart amount is {}".format(cash_paid, self.total)
-        balance = cash_paid - self.total
-        return "Exchange amount: {}".format(balance)
 ```
 
 **Object and it's Uses Code Snippet:**
-```python
-# Driver code
-cart = ShoppingCart()
+```Java
+public class ShoppingCartTest {
+    public static void main(String[] args) {
+        ShoppingCart cart = new ShoppingCart();
 
-cart.add_item('A', 10, 50)
-cart.add_item('B', 5, 20)
+        // Add items
+        cart.addItem("A", 10, 50);
+        cart.addItem("B", 5, 20);
 
-cart.remove_item('B', 1, 20)
+        // Remove items
+        cart.removeItem("B", 1, 20);
 
-cart_res = cart.checkout(600)
+        // Checkout
+        String result = cart.checkout(600);
 
-print('Total cart amount:', cart.total)
-print('Cart items:', cart.items)
-
-print(cart_res)
+        // Output results
+        System.out.println("Total cart amount: " + cart.getTotal());
+        System.out.println("Cart items: " + cart.getItems());
+        System.out.println(result);
+    }
+}
 ```
 
 **Response:**
@@ -74,28 +99,34 @@ The four principles of object-oriented programming are encapsulation, abstractio
 
 **Encapsulation Code Snippet:**
 
-```python
-class Product:
+```Java
+public class Product {
+    private int maxPrice;
 
-    def __init__(self):
-        self.__maxprice = 900
+    public Product() {
+        this.maxPrice = 900; // default max price
+    }
 
-    def sell(self):
-        print("Selling Price: {}".format(self.__maxprice))
+    public void sell() {
+        System.out.println("Selling Price: " + this.maxPrice);
+    }
 
-    def set_max_price(self, price):
-        self.__maxprice = price
+    public void setMaxPrice(int price) {
+        this.maxPrice = price;
+    }
 
-product = Product()
-product.sell()
+    public static void main(String[] args) {
+        Product product = new Product();
+        product.sell(); // Display the initial selling price
 
-# change the price
-product.__maxprice = 1000
-product.sell()
+        // Attempt to change the price directly (this would not compile if uncommented)
+        // product.maxPrice = 1000; // This line would cause a compile error in Java
 
-# using setter function
-product.set_max_price(1000)
-product.sell()
+        // Using setter function to change the price
+        product.setMaxPrice(1000);
+        product.sell(); // Display the new selling price
+    }
+}
 ```
 
 
@@ -110,34 +141,47 @@ Selling Price: 1000
 
 **Abstraction Code Snippet:**
 
-```python
+```Java
 from abc import ABC, abstractmethod
 
-class Parent(ABC):
-  def common(self):
-    print('In common method of Parent')
+abstract class Parent {
+    // Common method in the abstract class
+    public void common() {
+        System.out.println("In common method of Parent");
+    }
 
-  @abstractmethod
-  def vary(self):
-    pass
+    // Abstract method that must be overridden
+    public abstract void vary();
+}
 
-class Child1(Parent):
-  def vary(self):
-    print('In vary method of Child1')
+class Child1 extends Parent {
+    @Override
+    public void vary() {
+        System.out.println("In vary method of Child1");
+    }
+}
 
-class Child2(Parent):
-  def vary(self):
-    print('In vary method of Child2')
+class Child2 extends Parent {
+    @Override
+    public void vary() {
+        System.out.println("In vary method of Child2");
+    }
+}
 
-# object of Child1 class
-child1 = Child1()
-child1.common()
-child1.vary()
+public class Main {
+    public static void main(String[] args) {
+        // Object of Child1 class
+        Child1 child1 = new Child1();
+        child1.common();
+        child1.vary();
 
-# object of Child2 class
-child2 = Child2()
-child2.common()
-child2.vary()
+        // Object of Child2 class
+        Child2 child2 = new Child2();
+        child2.common();
+        child2.vary();
+    }
+}
+
 ```
 
 
@@ -153,30 +197,44 @@ In vary method of Child2
 
 **Inheritance Code Snippet:**
 
-```python
-class Person(object): 
+```Java
+class Person {
+    private String name;
 
-    def __init__(self, name):
-        self.name = name
+    public Person(String name) {
+        this.name = name;
+    }
 
-    def get_name(self):
-        return self.name
+    public String getName() {
+        return name;
+    }
 
-    def is_employee(self):
-        return False
-   
+    public boolean isEmployee() {
+        return false;
+    }
+}
 
-class Employee(Person):
+class Employee extends Person {
+    public Employee(String name) {
+        super(name);
+    }
 
-    def is_employee(self): 
-        return True
-   
-# Driver code
-emp = Person("Person 1")
-print("{} is employee: {}".format(emp.get_name(), emp.is_employee()))
+    @Override
+    public boolean isEmployee() {
+        return true;
+    }
+}
 
-emp = Employee("Employee 1")
-print("{} is employee: {}".format(emp.get_name(), emp.is_employee()))
+public class Main {
+    public static void main(String[] args) {
+        Person emp = new Person("Person 1");
+        System.out.println(emp.getName() + " is employee: " + emp.isEmployee());
+
+        emp = new Employee("Employee 1");
+        System.out.println(emp.getName() + " is employee: " + emp.isEmployee());
+    }
+}
+
 ```
 
 
@@ -190,29 +248,39 @@ Employee 1 is employee: True
 
 **Polymorphism Code Snippet:**
 
-```python
-class Bishops:
+```Java
+interface ChessPiece {
+    void move();
+}
 
-    def move(self):
-        print("Bishops can move diagonally")
+class Bishops implements ChessPiece {
+    @Override
+    public void move() {
+        System.out.println("Bishops can move diagonally");
+    }
+}
 
-class Knights:
+class Knights implements ChessPiece {
+    @Override
+    public void move() {
+        System.out.println("Knights can move two squares vertically and one square horizontally, or two squares horizontally and one square vertically");
+    }
+}
 
-    def move(self):
-        print("Knights can move two squares vertically and one square horizontally, or two squares horizontally and one square vertically")
+public class ChessGame {
+    public static void main(String[] args) {
+        ChessPiece bishop = new Bishops();
+        ChessPiece knight = new Knights();
 
-# common interface
-def move_test(chess_piece):
-    chess_piece.move()
-# Driver code
+        moveTest(bishop);
+        moveTest(knight);
+    }
 
-#instantiate objects
-bishop = Bishops()
-knight = Knights()
+    public static void moveTest(ChessPiece chessPiece) {
+        chessPiece.move();
+    }
+}
 
-# passing the object
-move_test(bishop)
-move_test(knight)
 ```
 
 
